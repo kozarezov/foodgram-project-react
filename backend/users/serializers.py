@@ -9,8 +9,7 @@ User = get_user_model()
 class CustomUserSerializer(UserSerializer):
     class Meta:
         model = User
-        fields = (settings.LOGIN_FIELD, settings.USER_ID_FIELD
-                  ) + tuple(User.REQUIRED_FIELDS)
+        fields = (settings.LOGIN_FIELD,) + tuple(User.REQUIRED_FIELDS)
         read_only_fields = (settings.LOGIN_FIELD,)
 
 
@@ -18,9 +17,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
     class Meta:
         model = User
-        fields = (settings.LOGIN_FIELD,
-                  settings.USER_ID_FIELD,
-                  "password",
+        fields = (settings.LOGIN_FIELD, "password",
                   ) + tuple(User.REQUIRED_FIELDS)
 
 
