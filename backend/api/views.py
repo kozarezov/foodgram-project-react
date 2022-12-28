@@ -11,12 +11,12 @@ from .models import (FavoriteRecipe, Follow, Ingredient, NumberIngredient,
                      ShoppingList, Recipe, Tag)
 from .paginators import CustomPagination
 from .permissions import IsOwnerOrAdminOrReadOnly
-from .serializers import (UserSerializer, )
+from .serializers import (UserSerializer, FollowSerializer)
 
 User = get_user_model()
 
 
-class CustomUserViewSet(UserViewSet):
+class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     pagination_class = CustomPagination
     serializer_class = UserSerializer
@@ -39,7 +39,7 @@ class CustomUserViewSet(UserViewSet):
                 'errors': 'Вы уже подписаны на данного пользователя.'
             }, status=status.HTTP_400_BAD_REQUEST)
         follow = Follow.objects.create(user=user, author=author)
-        serializer = ShowFollowerSerializer(
+        serializer = FollowSerializer(
             follow, context={'request': request}
         )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -62,7 +62,7 @@ class CustomUserViewSet(UserViewSet):
         user = request.user
         queryset = Follow.objects.filter(user=user)
         pages = self.paginate_queryset(queryset)
-        serializer = ShowFollowerSerializer(
+        serializer = FollowSerializer(
             pages,
             many=True,
             context={'request': request}
