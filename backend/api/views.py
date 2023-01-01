@@ -11,7 +11,8 @@ from .models import (FavoriteRecipe, Follow, Ingredient, NumberIngredient,
                      ShoppingList, Recipe, Tag)
 from .paginators import CustomPagination
 from .permissions import IsOwnerOrAdminOrReadOnly
-from .serializers import (UserSerializer, FollowSerializer)
+from .serializers import (UserSerializer, FollowSerializer, TagSerializer, IngredientSerializer)
+from .filters import IngredientNameFilter
 
 User = get_user_model()
 
@@ -68,3 +69,18 @@ class UserViewSet(UserViewSet):
             context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
+
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = (AllowAny,)
+    pagination_class = None
+
+
+class IngredientsViewSet(viewsets.ModelViewSet):
+    serializer_class = IngredientSerializer
+    queryset = Ingredient.objects.all()
+    pagination_class = None
+    permission_classes = (AllowAny,)
+    filterset_class = IngredientNameFilter
