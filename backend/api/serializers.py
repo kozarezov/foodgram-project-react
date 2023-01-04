@@ -137,7 +137,7 @@ class IngredientsAmountSerializer(serializers.ModelSerializer):
         return self._get_ingredient(amount.ingredient.id).name
 
     def get_measurement_unit(self, amount):
-        return self._get_ingredient(amount.ingredient.id).measurement_unit
+        return self._get_ingredient(amount.ingredient.id).measure
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -260,7 +260,7 @@ class FollowerRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class PurchaseSerializer(FavoritesSerializer):
+class ShoppingListSerializer(FavoritesSerializer):
     """Сериализатор для списка покупок."""
 
     class Meta(FavoritesSerializer.Meta):

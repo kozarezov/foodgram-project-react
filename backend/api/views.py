@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.http.response import HttpResponse
+from django.db.models import Sum
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -11,8 +12,11 @@ from .models import (FavoriteRecipe, Follow, Ingredient, NumberIngredient,
                      ShoppingList, Recipe, Tag)
 from .paginators import CustomPagination
 from .permissions import IsOwnerOrAdminOrReadOnly
-from .serializers import (UserSerializer, FollowSerializer, TagSerializer, IngredientSerializer)
-from .filters import IngredientNameFilter
+from .serializers import (UserSerializer, FollowSerializer, TagSerializer,
+                          IngredientSerializer, CreateUpdateRecipeSerializer,
+                          RecipeSerializer, ShoppingListSerializer,
+                          FavoritesSerializer)
+from .filters import IngredientNameFilter, RecipeFilter
 
 User = get_user_model()
 
@@ -84,3 +88,96 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     pagination_class = None
     permission_classes = (AllowAny,)
     filterset_class = IngredientNameFilter
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
+    pagination_class = CustomPagination
+    permission_classes = (IsOwnerOrAdminOrReadOnly,)
+    filter_class = RecipeFilter
+
+    def get_serializer_class(self):
+        if self.request.method in ('POST', 'PUT', 'PATCH'):
+            return CreateUpdateRecipeSerializer
+        return RecipeSerializer
+
+    def perform_create(self, serializer):
+        return serializer.save(author=self.request.user)
+
+    def recipe_post_method(self, request, AnySerializer, pk):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+
+        data = {
+            'user': user.id,
+            'recipe': recipe.id,
+        }
+        serializer = AnySerializer(
+            data=data,
+            context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def recipe_delete_method(self, request, AnyModel, pk):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        favorites = get_object_or_404(
+            AnyModel, user=user, recipe=recipe
+        )
+        favorites.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        detail=True,
+        methods=('post',),
+        permission_classes=[IsAuthenticated]
+    )
+    def favorite(self, request, pk=None):
+        if request.method == 'POST':
+            return self.recipe_post_method(
+                request, FavoritesSerializer, pk
+            )
+
+    @favorite.mapping.delete
+    def delete_favorite(self, request, pk=None):
+        return self.recipe_delete_method(
+            request, FavoriteRecipe, pk
+        )
+
+    @action(
+        detail=True,
+        methods=('post',),
+        permission_classes=[IsAuthenticated]
+    )
+    def shopping_cart(self, request, pk=None):
+        if request.method == 'POST':
+            return self.recipe_post_method(
+                request, ShoppingListSerializer, pk
+            )
+
+    @shopping_cart.mapping.delete
+    def delete_shopping_cart(self, request, pk=None):
+        return self.recipe_delete_method(
+            request, ShoppingList, pk
+        )
+
+    @action(detail=False, methods=['get'],
+            permission_classes=[IsAuthenticated])
+    def download_shopping_cart(self, request):
+        queryset = self.get_queryset()
+        cart_objects = ShoppingList.objects.filter(user=request.user)
+        recipes = queryset.filter(shopping_lists__in=cart_objects)
+        ingredients = NumberIngredient.objects.filter(recipes__in=recipes)
+        ing_types = Ingredient.objects.filter(
+            ingredients_amount__in=ingredients
+        ).annotate(total=Sum('ingredients_amount__amount'))
+
+        lines = [f'{ing_type.name}, {ing_type.total}'
+                 f' {ing_type.measure}' for ing_type in ing_types]
+        filename = 'shopping_list_ingredients.txt'
+        response_content = '\n'.join(lines)
+        response = HttpResponse(response_content, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        return response

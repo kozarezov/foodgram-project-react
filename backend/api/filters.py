@@ -14,7 +14,7 @@ class IngredientNameFilter(filters.FilterSet):
 
     class Meta:
         model = Ingredient
-        fields = ('name', 'measurement_unit')
+        fields = ('name', 'measure')
 
 
 class RecipeFilter(filters.FilterSet):

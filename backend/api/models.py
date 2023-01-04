@@ -146,7 +146,7 @@ class Recipe(models.Model):
         return self.favorite
 
     @property
-    def in_cart(self):
+    def is_in_shopping_cart(self):
         return self.cart
 
 
