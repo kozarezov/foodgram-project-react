@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.http.response import HttpResponse
 from django.db.models import Sum
+from django.http.response import HttpResponse
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -8,15 +8,15 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from .filters import IngredientNameFilter, RecipeFilter
 from .models import (FavoriteRecipe, Follow, Ingredient, NumberIngredient,
-                     ShoppingList, Recipe, Tag)
+                     Recipe, ShoppingList, Tag)
 from .paginators import CustomPagination
 from .permissions import IsOwnerOrAdminOrReadOnly
-from .serializers import (UserSerializer, FollowSerializer, TagSerializer,
-                          IngredientSerializer, CreateUpdateRecipeSerializer,
+from .serializers import (CreateUpdateRecipeSerializer, FavoritesSerializer,
+                          FollowSerializer, IngredientSerializer,
                           RecipeSerializer, ShoppingListSerializer,
-                          FavoritesSerializer)
-from .filters import IngredientNameFilter, RecipeFilter
+                          TagSerializer, UserSerializer)
 
 User = get_user_model()
 
