@@ -103,8 +103,6 @@ class Recipe(models.Model):
         auto_now_add=True,
         verbose_name='Дата публикации',
     )
-    favorite = models.BooleanField('Избранное', default=False)
-    cart = models.BooleanField('В списке покупок', default=False)
 
     class Meta:
         ordering = ('-pub_date',)
@@ -113,14 +111,6 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-
-    @property
-    def is_favorited(self):
-        return self.favorite
-
-    @property
-    def is_in_shopping_cart(self):
-        return self.cart
 
 
 class NumberIngredient(models.Model):
