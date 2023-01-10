@@ -28,7 +28,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(NumberIngredient)
 class NumberIngredientAdmin(admin.ModelAdmin):
-    list_display = ('ingredient', 'amount', 'recipes')
+    list_display = ('ingredient', 'amount')
 
 
 @admin.register(ShoppingList)
