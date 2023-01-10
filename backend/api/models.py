@@ -58,33 +58,6 @@ class Tag(models.Model):
         return f'{self.name} (цвет: {self.color})'
 
 
-class NumberIngredient(models.Model):
-    """Модель для количества ингредиентов в блюде."""
-
-    ingredient = models.ForeignKey(
-        Ingredient,
-        on_delete=models.CASCADE,
-        verbose_name='Ингредиент',
-        related_name='ingredients_amount',
-    )
-    amount = models.PositiveIntegerField(
-        verbose_name='Количество ингредиента',
-        default=0,
-        validators=(
-            MinValueValidator(
-                1, 'Слишком малое количество ингредиента.'
-            ),
-        ),
-    )
-
-    class Meta:
-        verbose_name = 'Количество ингредиента'
-        verbose_name_plural = 'Количество ингредиентов'
-
-    def __str__(self):
-        return f'{self.amount} {self.ingredient}'
-
-
 class Recipe(models.Model):
     """Модель рецептов."""
 
@@ -148,6 +121,43 @@ class Recipe(models.Model):
     @property
     def is_in_shopping_cart(self):
         return self.cart
+
+
+class NumberIngredient(models.Model):
+    """Модель для количества ингредиентов в блюде."""
+
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        verbose_name='Ингредиент',
+        related_name='ingredients_amount',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт',
+    )
+    amount = models.PositiveIntegerField(
+        verbose_name='Количество ингредиента',
+        default=0,
+        validators=(
+            MinValueValidator(
+                1, 'Слишком малое количество ингредиента.'
+            ),
+        ),
+    )
+
+    class Meta:
+        verbose_name = 'Количество ингредиента'
+        verbose_name_plural = 'Количество ингредиентов'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe'], name='number_ingredient_unique'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.amount} {self.ingredient}'
 
 
 class FavoriteRecipe(models.Model):

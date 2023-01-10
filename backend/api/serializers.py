@@ -3,6 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from .models import (FavoriteRecipe, Follow, Ingredient, NumberIngredient,
                      Recipe, ShoppingList, Tag)
@@ -129,6 +130,12 @@ class IngredientsAmountSerializer(serializers.ModelSerializer):
     class Meta:
         model = NumberIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=NumberIngredient.objects.all(),
+                fields=['ingredient', 'recipe']
+            )
+        ]
 
     def _get_ingredient(self, ingredient_id):
         return get_object_or_404(Ingredient, id=ingredient_id)
