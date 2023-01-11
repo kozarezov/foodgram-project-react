@@ -167,7 +167,6 @@ class CreateUpdateRecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientsAmountSerializer(
         source='numberingredient_set',
         many=True,
-        read_only=True,
     )
     tags = TagSerializer(read_only=True, many=True)
 
