@@ -164,7 +164,11 @@ class CreateUpdateRecipeSerializer(serializers.ModelSerializer):
 
     image = Base64ImageField(max_length=None, use_url=True)
     author = UserSerializer(read_only=True)
-    ingredients = IngredientsAmountSerializer(many=True)
+    ingredients = IngredientsAmountSerializer(
+        source='numberingredient_set',
+        many=True,
+        read_only=True,
+    )
     tags = TagSerializer(read_only=True, many=True)
 
     class Meta:
