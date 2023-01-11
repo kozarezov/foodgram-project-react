@@ -204,63 +204,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         NumberIngredient.objects.filter(recipe=instance).all().delete()
         self.create_ingredients(validated_data.get('ingredients'), instance)
         instance.save()
-        return 
+        return
 
 
-class FavoritesSerializer(serializers.ModelSerializer):
-    """ Сериализатор избранных рецептов."""
-
-    id = serializers.ReadOnlyField(source='recipe.id')
-    name = serializers.ReadOnlyField(source='recipe.name')
-    image = Base64ImageField(source='recipe.image', read_only=True)
-    cooking_time = serializers.ReadOnlyField(source='recipe.cooking_time')
-
-    class Meta:
-        model = FavoriteRecipe
-        fields = ('id', 'name', 'image', 'cooking_time', 'user', 'recipe')
-        extra_kwargs = {'user': {'write_only': True},
-                        'recipe': {'write_only': True}}
-
-    def validate(self, data):
-        if FavoriteRecipe.objects.filter(user=data['user'],
-                                         recipe=data['recipe']).exists():
-            raise serializers.ValidationError(
-                'Рецепт уже добавлен в избранное.'
-            )
-        return data
-
-
-class FollowerRecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор для подписок."""
+class CropRecipeSerializer(serializers.ModelSerializer):
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
-
-
-class ShoppingListSerializer(FavoritesSerializer):
-    """Сериализатор для списка покупок."""
-
-    class Meta(FavoritesSerializer.Meta):
-        model = ShoppingList
-
-    def validate(self, data):
-        request = self.context.get('request')
-        recipe_id = data['recipe'].id
-        purchase_exists = ShoppingList.objects.filter(
-            user=request.user,
-            recipe__id=recipe_id
-        ).exists()
-
-        if purchase_exists:
-            raise serializers.ValidationError(
-                'В списке покупок такой рецепт есть'
-            )
-        return data
-
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return FollowerRecipeSerializer(
-            instance.recipe,
-            context=context).data
+        read_only_fields = ('id', 'name', 'image', 'cooking_time')
