@@ -14,8 +14,8 @@ from .models import (FavoriteRecipe, Follow, Ingredient, NumberIngredient,
 from .paginators import CustomPagination
 from .permissions import IsOwnerOrAdminOrReadOnly
 from .serializers import (FollowSerializer, IngredientSerializer,
-                          RecipeSerializer, CropRecipeSerializer,
-                          TagSerializer, UserSerializer)
+                          RecipeSerializer, TagSerializer, SummuryRecipeSerializer,
+                          UserSerializer)
 
 User = get_user_model()
 
@@ -143,7 +143,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
         recipe = get_object_or_404(Recipe, id=pk)
         model.objects.create(user=user, recipe=recipe)
-        serializer = CropRecipeSerializer(recipe)
+        serializer = SummuryRecipeSerializer(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete_obj(self, model, user, pk):

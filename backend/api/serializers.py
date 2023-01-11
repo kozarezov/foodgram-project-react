@@ -5,8 +5,8 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from .models import (FavoriteRecipe, Follow, Ingredient, NumberIngredient,
-                     Recipe, ShoppingList, Tag)
+from .models import (Follow, Ingredient, NumberIngredient,
+                     Recipe, Tag)
 
 User = get_user_model()
 
@@ -77,10 +77,13 @@ class FollowSerializer(serializers.ModelSerializer):
 
 class SummuryRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для краткого описания рецепта."""
+    
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
+        read_only_fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -205,12 +208,3 @@ class RecipeSerializer(serializers.ModelSerializer):
         self.create_ingredients(validated_data.get('ingredients'), instance)
         instance.save()
         return
-
-
-class CropRecipeSerializer(serializers.ModelSerializer):
-    image = Base64ImageField()
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
-        read_only_fields = ('id', 'name', 'image', 'cooking_time')
