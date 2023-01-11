@@ -13,8 +13,7 @@ from .models import (FavoriteRecipe, Follow, Ingredient, NumberIngredient,
                      Recipe, ShoppingList, Tag)
 from .paginators import CustomPagination
 from .permissions import IsOwnerOrAdminOrReadOnly
-from .serializers import (FavoritesSerializer,
-                          FollowSerializer, IngredientSerializer,
+from .serializers import (FollowSerializer, IngredientSerializer,
                           RecipeSerializer, ShoppingListSerializer,
                           TagSerializer, UserSerializer)
 
