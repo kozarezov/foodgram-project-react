@@ -1,4 +1,4 @@
-import django_filters as filters
+from django_filters.rest_framework import FilterSet, filters
 from django.contrib.auth import get_user_model
 
 from .models import Ingredient, Recipe
@@ -6,7 +6,7 @@ from .models import Ingredient, Recipe
 User = get_user_model()
 
 
-class IngredientNameFilter(filters.FilterSet):
+class IngredientNameFilter(FilterSet):
     name = filters.CharFilter(
         field_name='name',
         lookup_expr='istartswith'
@@ -17,17 +17,17 @@ class IngredientNameFilter(filters.FilterSet):
         fields = ('name', 'measure')
 
 
-class RecipeFilter(filters.FilterSet):
+class RecipeFilter(FilterSet):
     tags = filters.AllValuesMultipleFilter(
         field_name='tags__slug'
     )
     author = filters.ModelChoiceFilter(
         queryset=User.objects.all()
     )
-    is_favorited = filters.rest_framework.BooleanFilter(
+    is_favorited = filters.BooleanFilter(
         method='filter_is_favorited'
     )
-    is_in_shopping_cart = filters.rest_framework.BooleanFilter(
+    is_in_shopping_cart = filters.BooleanFilter(
         method='filter_is_in_shopping_cart'
     )
 
