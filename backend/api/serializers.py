@@ -157,7 +157,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return Recipe.objects.filter(shoppinglist__user=user, id=obj.id).exists()
 
     def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
+        ingredients = data.get('ingredients')
         if not ingredients:
             raise serializers.ValidationError({
                 'ingredients': 'Нужен хоть один ингридиент для рецепта'})
@@ -184,6 +184,13 @@ class RecipeSerializer(serializers.ModelSerializer):
                 ingredient_id=ingredient.get('id'),
                 amount=ingredient.get('amount'),
             )
+        NumberIngredient.objects.bulk_create(
+            [NumberIngredient(
+                ingredient_id=ingredient.get('id'),
+                recipe=recipe,
+                amount=ingredient.get('amount')
+            ) for ingredient in ingredients]
+        )
 
     def create(self, validated_data):
         image = validated_data.pop('image')
@@ -195,16 +202,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        instance.image = validated_data.get('image', instance.image)
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
-        )
+        tags_data = validated_data.pop('tags')
+        instance = super().update(instance, validated_data)
         instance.tags.clear()
-        tags_data = self.initial_data.get('tags')
+        instance.ingredients.clear()
         instance.tags.set(tags_data)
         NumberIngredient.objects.filter(recipe=instance).all().delete()
         self.create_ingredients(validated_data.get('ingredients'), instance)
         instance.save()
-        return
+        return instance
