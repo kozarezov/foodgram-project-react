@@ -1,4 +1,4 @@
-from django_filters.rest_framework import filters
+import django_filters as filters
 from django.contrib.auth import get_user_model
 
 from .models import Ingredient, Recipe
@@ -24,10 +24,10 @@ class RecipeFilter(filters.FilterSet):
     author = filters.ModelChoiceFilter(
         queryset=User.objects.all()
     )
-    is_favorited = filters.BooleanFilter(
+    is_favorited = filters.rest_framework.BooleanFilter(
         method='filter_is_favorited'
     )
-    is_in_shopping_cart = filters.BooleanFilter(
+    is_in_shopping_cart = filters.rest_framework.BooleanFilter(
         method='filter_is_in_shopping_cart'
     )
 
