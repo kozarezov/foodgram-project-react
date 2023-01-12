@@ -122,7 +122,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         queryset = self.get_queryset()
         cart_objects = ShoppingList.objects.filter(user=request.user)
-        recipes = queryset.filter(shopping_lists__in=cart_objects)
+        recipes = queryset.filter(shoppinglist__in=cart_objects)
         ingredients = NumberIngredient.objects.filter(recipes__in=recipes)
         ing_types = Ingredient.objects.filter(
             ingredients_amount__in=ingredients

@@ -55,7 +55,7 @@ class Tag(models.Model):
         verbose_name_plural = 'Тэги'
 
     def __str__(self):
-        return f'{self.name} (цвет: {self.color})'
+        return self.name
 
 
 class Recipe(models.Model):
@@ -89,7 +89,6 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
-        related_name='recipes',
         verbose_name='Теги',
         help_text='Выберите подходящие теги для рецепта',
     )
@@ -157,12 +156,12 @@ class FavoriteRecipe(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='favorite_author',
+        related_name='favoriteauthor',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='favorite_recipe',
+        related_name='favoriterecipe',
     )
     date_added = models.DateTimeField(
         auto_now_add=True,
@@ -219,12 +218,12 @@ class ShoppingList(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='shopping_lists',
+        related_name='shoppinglist',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='shopping_lists',
+        related_name='shoppinglist',
     )
     date_added = models.DateTimeField(
         auto_now_add=True,
