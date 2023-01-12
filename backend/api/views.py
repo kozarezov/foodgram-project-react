@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.http.response import HttpResponse
-from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -78,16 +77,13 @@ class UserViewSet(UserViewSet):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (AllowAny,)
-    pagination_class = None
+    permission_classes = (IsOwnerOrAdminOrReadOnly,)
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
-    pagination_class = None
-    permission_classes = (AllowAny,)
-    filter_backends = (DjangoFilterBackend, )
+    permission_classes = (IsOwnerOrAdminOrReadOnly,)
     filterset_class = IngredientNameFilter
 
 
@@ -95,7 +91,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     pagination_class = CustomPagination
-    filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
     permission_classes = [IsOwnerOrAdminOrReadOnly]
 
