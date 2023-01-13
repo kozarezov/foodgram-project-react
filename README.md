@@ -26,6 +26,11 @@ After deployment, the project is available by IP
 ```sh
  http://158.160.34.118
  ```
+Admin-zone:
+```sh
+ admin@admin.ru
+ admin12345678
+ ```
 
 ## 3. Environment variables:
 
