@@ -24,7 +24,7 @@ After deployment, the project is available by IP
 #### IP adress to deployed project:
 
 ```sh
- http://158.160.53.131
+ http://158.160.34.118
  ```
 
 ## 3. Environment variables:
