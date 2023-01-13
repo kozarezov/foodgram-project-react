@@ -22,16 +22,12 @@ class RecipeFilter(FilterSet):
 
     def filter_is_favorited(self, queryset, name, value):
         if value and not self.request.user.is_anonymous:
-            print(f'зашел в избранное {value}')
             return queryset.filter(favoriterecipe__user=self.request.user)
-        print(f'Не зашел в избранное{value}')
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         if value and not self.request.user.is_anonymous:
-            print(f'зашел в список {value}')
             return queryset.filter(shoppinglist__user=self.request.user)
-        print(f'Не зашел в список{value}')
         return queryset
 
     class Meta:
